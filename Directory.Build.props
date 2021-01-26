@@ -1,0 +1,38 @@
+<Project>
+
+  <PropertyGroup>
+    <VersionPrefix>1.0.0</VersionPrefix>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)settings/project.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Authors>Peter Nylander</Authors>
+    <RepositoryType>git</RepositoryType>
+    <RootNamespace>ReverseProxyPOC</RootNamespace>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>CODE_ANALYSIS</DefineConstants>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup Condition="!$(MSBuildProjectName.Contains('.Deployment'))">
+      <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.321" PrivateAssets="all" />
+      <AdditionalFiles Include="$(MSBuildThisFileDirectory)settings/stylecop.json">
+        <Link>Properties\stylecop.json</Link>
+    </AdditionalFiles>
+  </ItemGroup>
+
+</Project>
