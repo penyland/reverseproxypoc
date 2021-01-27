@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using ReverseProxyPOC.Proxy.Services;
 
 namespace ReverseProxyPOC.Proxy
 {
@@ -34,6 +35,8 @@ namespace ReverseProxyPOC.Proxy
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "proxy", Version = "v1" });
             });
+
+            services.AddSingleton<IProxyManagerService, ProxyManagerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,6 +57,7 @@ namespace ReverseProxyPOC.Proxy
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapReverseProxy();
             });
         }
