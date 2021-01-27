@@ -24,6 +24,10 @@ namespace ReverseProxyPOC.Frontend
             {
                 client.BaseAddress = Configuration.GetValue<Uri>("Backend:BaseAddress");
             });
+            services.AddHttpClient<ProxyHttpClient>(client =>
+            {
+                client.BaseAddress = Configuration.GetValue<Uri>("Proxy:BaseAddress");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
