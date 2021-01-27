@@ -10,11 +10,11 @@ namespace ReverseProxyPOC.Controllers
     [ApiController]
     public class ProxyController : ControllerBase
     {
-        private readonly IProxyManagerService proxyManagerService;
+        private readonly IProxyConfigurationService proxyConfigurationService;
 
-        public ProxyController(IProxyManagerService proxyManagerService)
+        public ProxyController(IProxyConfigurationService proxyConfigurationService)
         {
-            this.proxyManagerService = proxyManagerService ?? throw new ArgumentNullException(nameof(proxyManagerService));
+            this.proxyConfigurationService = proxyConfigurationService ?? throw new ArgumentNullException(nameof(proxyConfigurationService));
         }
 
         [HttpPost]

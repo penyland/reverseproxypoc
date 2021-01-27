@@ -36,7 +36,9 @@ namespace ReverseProxyPOC.Proxy
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "proxy", Version = "v1" });
             });
 
-            services.AddSingleton<IProxyManagerService, ProxyManagerService>();
+            services.AddSingleton<IProxyConfigurationService, ProxyConfigurationService>();
+
+            services.AddProxyConfiguration();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,6 +50,8 @@ namespace ReverseProxyPOC.Proxy
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "proxy v1"));
             }
+
+            app.UseProxyConfigurationRefresher();
 
             app.UseHttpsRedirection();
 

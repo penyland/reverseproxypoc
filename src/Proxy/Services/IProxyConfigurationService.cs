@@ -1,6 +1,6 @@
 ﻿namespace ReverseProxyPOC.Proxy.Services
 {
-    public class ProxyManagerService : IProxyManagerService
+    public interface IProxyConfigurationService
     {
     }
 }
