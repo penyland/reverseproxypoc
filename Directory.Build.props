@@ -15,7 +15,6 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <Authors>Peter Nylander</Authors>
     <RepositoryType>git</RepositoryType>
-    <RootNamespace>ReverseProxyPOC</RootNamespace>
   </PropertyGroup>
   
   <PropertyGroup>
