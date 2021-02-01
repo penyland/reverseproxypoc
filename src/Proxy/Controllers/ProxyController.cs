@@ -1,16 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.ReverseProxy.Service;
 using ReverseProxyPOC.Proxy.Services;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ReverseProxyPOC.Controllers
 {
-    [Route("proxy")]
+    [Route("api/proxy")]
     [ApiController]
     public class ProxyController : ControllerBase
     {
@@ -25,8 +23,12 @@ namespace ReverseProxyPOC.Controllers
             this.configuration = (IConfigurationRoot)configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public ProxyController(IOptionsMonitor<IProxyConfigProvider> optionsMonitor)
+        [HttpGet]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public IActionResult GetProxyConfiguration()
         {
+            var config = this.proxyConfigProvider.GetConfig();
+            return Ok(config);
         }
 
         [HttpPost]
