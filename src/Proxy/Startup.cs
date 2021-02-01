@@ -4,10 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Microsoft.ReverseProxy.Abstractions;
 using ReverseProxyPOC.Proxy.Services;
-using System;
-using System.Collections.Generic;
 
 namespace ReverseProxyPOC.Proxy
 {
@@ -44,8 +41,15 @@ namespace ReverseProxyPOC.Proxy
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "proxy v1"));
+                app.UseSwagger(c =>
+                {
+                    c.RouteTemplate = "proxy/swagger/{documentname}/swagger.json";
+                });
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/proxy/swagger/v1/swagger.json", "Proxy v1");
+                    c.RoutePrefix = "proxy/swagger";
+                });
             }
 
             app.UseProxyConfigurationRefresher();
