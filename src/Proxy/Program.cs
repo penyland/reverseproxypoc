@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using ReverseProxyPOC.Proxy.Configuration;
+using Serilog;
 
 namespace ReverseProxyPOC.Proxy
 {
@@ -21,6 +17,14 @@ namespace ReverseProxyPOC.Proxy
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+            .ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddCustomConfiguration(() => { });
+            })
+            .UseSerilog((context, config) =>
+            {
+                config.ReadFrom.Configuration(context.Configuration);
+            });
     }
 }
