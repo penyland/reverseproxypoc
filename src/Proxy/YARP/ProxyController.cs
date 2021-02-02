@@ -6,17 +6,17 @@ using ReverseProxyPOC.Proxy.Services;
 using System;
 using System.Threading.Tasks;
 
-namespace ReverseProxyPOC.Controllers
+namespace ReverseProxyPOC.Proxy.YARP
 {
-    [Route("api/proxy")]
     [ApiController]
+    [Route("api/[controller]")]
     public class ProxyController : ControllerBase
     {
-        private readonly IProxyConfigurationService proxyConfigurationService;
+        private readonly IProxyDynamicRoutesConfigurationService proxyConfigurationService;
         private readonly IProxyConfigProvider proxyConfigProvider;
         private readonly IConfigurationRoot configuration;
 
-        public ProxyController(IProxyConfigurationService proxyConfigurationService, IProxyConfigProvider proxyConfigProvider, IConfiguration configuration)
+        public ProxyController(IProxyDynamicRoutesConfigurationService proxyConfigurationService, IProxyConfigProvider proxyConfigProvider, IConfiguration configuration)
         {
             this.proxyConfigurationService = proxyConfigurationService ?? throw new ArgumentNullException(nameof(proxyConfigurationService));
             this.proxyConfigProvider = proxyConfigProvider ?? throw new ArgumentNullException(nameof(proxyConfigProvider));
@@ -25,7 +25,7 @@ namespace ReverseProxyPOC.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public IActionResult GetProxyConfiguration()
+        public IActionResult Get()
         {
             var config = this.proxyConfigProvider.GetConfig();
             return Ok(config);

@@ -13,7 +13,7 @@ namespace ReverseProxyPOC.Proxy
                 throw new ArgumentNullException(nameof(services));
             }
 
-            services.AddSingleton<IProxyConfigurationService, ProxyConfigurationService>();
+            services.AddSingleton<IProxyDynamicRoutesConfigurationService, ProxyDynamicRoutesConfigurationService>();
             return services;
         }
     }

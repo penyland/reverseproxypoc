@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using ReverseProxyPOC.Proxy.Configuration;
 using Serilog;
+using System;
 
 namespace ReverseProxyPOC.Proxy
 {
@@ -9,6 +10,7 @@ namespace ReverseProxyPOC.Proxy
     {
         public static void Main(string[] args)
         {
+            // AppContext.SetSwitch("Microsoft.AspNetCore.Routing.UseCorrectCatchAllBehavior", true);
             CreateHostBuilder(args).Build().Run();
         }
 

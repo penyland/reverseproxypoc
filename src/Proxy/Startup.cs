@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Microsoft.ReverseProxy.Service.Proxy;
+using ReverseProxyPOC.Proxy.Configuration;
 using ReverseProxyPOC.Proxy.Services;
 
 namespace ReverseProxyPOC.Proxy
@@ -27,16 +31,26 @@ namespace ReverseProxyPOC.Proxy
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "proxy", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Proxy", Version = "v1" });
             });
 
-            services.AddSingleton<IProxyConfigurationService, ProxyConfigurationService>();
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy
+                        .WithOrigins("https://localhost:44341", "http://localhost:55420")
+                        .AllowAnyMethod();
+                });
+            });
 
-            services.AddProxyConfiguration();
+            services.AddHttpProxy();
+            services.AddSingleton<IProxyDynamicRoutesConfigurationService, ProxyDynamicRoutesConfigurationService>();
+            services.AddSingleton<RouteValueTransformer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHttpProxy httpProxy)
         {
             if (env.IsDevelopment())
             {
@@ -52,7 +66,7 @@ namespace ReverseProxyPOC.Proxy
                 });
             }
 
-            app.UseProxyConfigurationRefresher();
+            // app.UseProxyConfigurationRefresher();
 
             app.UseHttpsRedirection();
 
@@ -60,14 +74,29 @@ namespace ReverseProxyPOC.Proxy
 
             app.UseAuthorization();
 
-            app.UseCors(policy =>
-                policy.WithOrigins("https://localhost:44341", "http://localhost:55420")
-                .AllowAnyMethod());
+            app.UseCors();
+
+            app.Use((context, next) =>
+            {
+                var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
+                var endpoint = endpointFeature.Endpoint;
+
+                if (endpoint != null)
+                {
+                    var routePattern = (endpoint as RouteEndpoint)?.RoutePattern.RawText;
+                }
+
+                return next();
+            });
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
-                endpoints.MapReverseProxy();
+                // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**route}");
+                endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}");
+                // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**catch-all}");
+
+                // endpoints.MapControllers();
+                // endpoints.MapReverseProxy();
             });
         }
     }

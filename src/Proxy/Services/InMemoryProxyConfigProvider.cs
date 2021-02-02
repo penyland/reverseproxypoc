@@ -1,18 +1,24 @@
 ﻿using Microsoft.Extensions.Primitives;
 using Microsoft.ReverseProxy.Abstractions;
 using Microsoft.ReverseProxy.Service;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
 namespace ReverseProxyPOC.Proxy.Services
 {
-    public class InMemoryProxyConfigProvider : IProxyConfigProvider, IInMemoryProxyConfigProvider
+    public sealed class InMemoryProxyConfigProvider : IProxyConfigProvider, IInMemoryProxyConfigProvider, IDisposable
     {
         private volatile InMemoryConfig _config;
 
         public InMemoryProxyConfigProvider(IReadOnlyList<ProxyRoute> routes, IReadOnlyList<Cluster> clusters)
         {
             _config = new InMemoryConfig(routes, clusters);
+        }
+
+        public void Dispose()
+        {
+            _config.Dispose();
         }
 
         public IProxyConfig GetConfig() => _config;
@@ -24,7 +30,7 @@ namespace ReverseProxyPOC.Proxy.Services
             oldConfig.SignalChange();
         }
 
-        private class InMemoryConfig : IProxyConfig
+        private class InMemoryConfig : IProxyConfig, IDisposable
         {
             private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
@@ -40,6 +46,11 @@ namespace ReverseProxyPOC.Proxy.Services
             public IReadOnlyList<Cluster> Clusters { get; }
 
             public IChangeToken ChangeToken { get; }
+
+            public void Dispose()
+            {
+                _cts.Dispose();
+            }
 
             internal void SignalChange()
             {

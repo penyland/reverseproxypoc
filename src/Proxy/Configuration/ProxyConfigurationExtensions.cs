@@ -19,7 +19,7 @@ namespace ReverseProxyPOC.Proxy
 
             // Verify if IProxyConfigurationService was done before calling UseProxyConfigurationRefresher.
             // We use the IProxyConfigurationService to make sure if the required services were added.
-            if (builder.ApplicationServices.GetService(typeof(IProxyConfigurationService)) == null)
+            if (builder.ApplicationServices.GetService(typeof(IProxyDynamicRoutesConfigurationService)) == null)
             {
                 throw new InvalidOperationException("Unable to find the required services. Please add all the required services by calling 'IServiceCollection.AddProxyConfiguration' inside the call to 'ConfigureServices(...)' in the application startup code.");
             }
