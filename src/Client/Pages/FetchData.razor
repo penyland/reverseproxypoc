@@ -37,10 +37,9 @@ else
 @code {
     private WeatherForecast[] forecasts;
 
-    protected override async Task OnInitializedAsync()
-    {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
-    }
+    protected override async Task OnInitializedAsync() => await GetWeatherForecastsAsync();
+
+    private async Task GetWeatherForecastsAsync() => forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("https://localhost:44368/WeatherForecast");
 
     public class WeatherForecast
     {

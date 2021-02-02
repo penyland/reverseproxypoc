@@ -60,6 +60,10 @@ namespace ReverseProxyPOC.Proxy
 
             app.UseAuthorization();
 
+            app.UseCors(policy =>
+                policy.WithOrigins("https://localhost:44341", "http://localhost:55420")
+                .AllowAnyMethod());
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
