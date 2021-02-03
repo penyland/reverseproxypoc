@@ -2,15 +2,16 @@
 {
     public class ProxyDynamicRoutesConfigurationService : IProxyDynamicRoutesConfigurationService
     {
-        public string GetController(string route)
+        public (string Controller, string Action) GetController(string route)
         {
             return route switch
             {
-                "WeatherForecast2" => "WeatherForecast",
-                "api/WeatherForecast" => "WeatherForecast",
-                "api/proxy" => "Proxy",
+                "WeatherForecast" => ("WeatherForecast", "GetForecasts"),
+                "api/WeatherForecast" => ("WeatherForecast", "GetForecast"),
+                "api/proxy" => ("Proxy", "Get"),
+                "Todo" => ("Todo", "GetTodoItems"),
 
-                _ => route
+                _ => (route, string.Empty)
             };
         }
     }

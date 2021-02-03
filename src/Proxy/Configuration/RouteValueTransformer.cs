@@ -17,6 +17,8 @@ namespace ReverseProxyPOC.Proxy.Configuration
 
         public override ValueTask<RouteValueDictionary> TransformAsync(HttpContext httpContext, RouteValueDictionary values)
         {
+            var url = httpContext.Request.Path.ToString();
+
             if (!values.ContainsKey("controller"))
             {
                 return new ValueTask<RouteValueDictionary>(values);
@@ -25,9 +27,9 @@ namespace ReverseProxyPOC.Proxy.Configuration
             var value = proxyDynamicRoutesConfigurationService.GetController((string)values["controller"]);
 
             // values["controller"] => must be the name of the controller not route
-            values["controller"] = value;
-            values["action"] = "Get"; // <= method name that we are calling
-            // values["id"] = id;
+            values["controller"] = value.Controller;
+            values["action"] = value.Action; // <= method name that we are calling
+            // values["id"] = "id";
 
             return new ValueTask<RouteValueDictionary>(values);
         }

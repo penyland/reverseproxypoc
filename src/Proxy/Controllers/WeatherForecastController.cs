@@ -17,16 +17,14 @@ namespace ReverseProxyPOC.Proxy.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
-        private readonly IHttpProxy httpProxy;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IHttpProxy httpProxy)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
-            this.httpProxy = httpProxy;
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public IEnumerable<WeatherForecast> GetForecasts()
         {
             _logger.LogInformation("GetWeatherForecasts");
             var rng = new Random();
@@ -37,6 +35,18 @@ namespace ReverseProxyPOC.Proxy.Controllers
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+        [HttpGet("{id?}")]
+        public WeatherForecast GetForecast(int id)
+        {
+            var rng = new Random();
+            return new WeatherForecast
+            {
+                Date = DateTime.Now,
+                TemperatureC = rng.Next(-20, 55),
+                Summary = Summaries[rng.Next(Summaries.Length)]
+            };
         }
     }
 }

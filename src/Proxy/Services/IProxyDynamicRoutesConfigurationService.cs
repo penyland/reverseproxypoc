@@ -2,6 +2,6 @@
 {
     public interface IProxyDynamicRoutesConfigurationService
     {
-        string GetController(string route);
+        (string Controller, string Action) GetController(string route);
     }
 }

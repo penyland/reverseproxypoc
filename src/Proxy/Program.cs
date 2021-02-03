@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Hosting;
 using ReverseProxyPOC.Proxy.Configuration;
 using Serilog;
-using System;
 
 namespace ReverseProxyPOC.Proxy
 {
@@ -23,6 +24,20 @@ namespace ReverseProxyPOC.Proxy
             .ConfigureAppConfiguration((context, config) =>
             {
                 config.AddCustomConfiguration(() => { });
+
+                //config.AddAzureAppConfiguration(options =>
+                //{
+                //    var settings = config.Build();
+                //    var connection = settings.GetConnectionString("AppConfig");
+                //    options
+                //      .Connect(connection)
+                //      .UseFeatureFlags()
+                //      // Load configuration values with no label
+                //      .Select(KeyFilter.Any, LabelFilter.Null)
+                //      // Override with any configuration values specific to current hosting env
+                //      .Select(KeyFilter.Any, context.HostingEnvironment.EnvironmentName)
+                //      .Select(keyFilter: "ProxyPOC:*", labelFilter: "Development");
+                //});
             })
             .UseSerilog((context, config) =>
             {

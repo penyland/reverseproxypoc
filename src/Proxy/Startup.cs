@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
 using Microsoft.ReverseProxy.Service.Proxy;
 using ReverseProxyPOC.Proxy.Configuration;
@@ -44,6 +45,8 @@ namespace ReverseProxyPOC.Proxy
                 });
             });
 
+            services.AddFeatureManagement();
+
             services.AddHttpProxy();
             services.AddSingleton<IProxyDynamicRoutesConfigurationService, ProxyDynamicRoutesConfigurationService>();
             services.AddSingleton<RouteValueTransformer>();
@@ -79,7 +82,7 @@ namespace ReverseProxyPOC.Proxy
             app.Use((context, next) =>
             {
                 var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
-                var endpoint = endpointFeature.Endpoint;
+                var endpoint = endpointFeature?.Endpoint;
 
                 if (endpoint != null)
                 {
