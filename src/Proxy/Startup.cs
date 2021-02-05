@@ -97,11 +97,6 @@ namespace ReverseProxyPOC.Proxy
                         routeEndpoint.RoutePattern.RawText);
                 }
 
-                foreach (var metadata in endpoint.Metadata)
-                {
-                    logger.LogInformation($"Endpoint has metadata: {metadata}");
-                }
-
                 return next();
             });
 
@@ -120,14 +115,17 @@ namespace ReverseProxyPOC.Proxy
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapReverseProxy();
+
+                endpoints.MapControllers();
+                // Map dynamic controller at order 0 so it runs before reverse proxy.
+                // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}", state: null, order: 0);
                 endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}");
 
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**route}");
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}");
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{action}/{id?}");
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**catch-all}");
-                // endpoints.MapControllers();
-                endpoints.MapReverseProxy();
             });
         }
     }

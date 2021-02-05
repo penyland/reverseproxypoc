@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using ReverseProxyPOC.Proxy.Services;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ReverseProxyPOC.Proxy.Configuration
@@ -18,35 +17,34 @@ namespace ReverseProxyPOC.Proxy.Configuration
 
         public override ValueTask<RouteValueDictionary> TransformAsync(HttpContext httpContext, RouteValueDictionary values)
         {
-            //var url = httpContext.Request.Path.ToString();
+            if (!values.ContainsKey("controller"))
+            {
+                return new ValueTask<RouteValueDictionary>(values);
+            }
 
-            //if (!values.ContainsKey("controller"))
-            //{
+            var controller = values["controller"];
+
+            // Check if endpoint is enabled in configuration or not
+            // if (!endPointEnabled(controller))
+            // {
             //    return new ValueTask<RouteValueDictionary>(values);
-            //}
+            // }
 
             if (values.ContainsKey("controller") && values.ContainsKey("id"))
             {
+                // Get controller and action from configuration service
                 values["controller"] = "WeatherForecast";
                 values["action"] = "GetForecast";
             }
             else
             {
-                var value = proxyDynamicRoutesConfigurationService.GetController((string)values["controller"]);
+                var endpointInfo = proxyDynamicRoutesConfigurationService.GetController((string)values["controller"]);
 
-                values["controller"] = value.Controller;
-                values["action"] = value.Action; // <= method name that we are calling
+                values["controller"] = endpointInfo.Controller; // <= must be the name of the controller not route
+                values["action"] = endpointInfo.Action; // <= method name that we are calling
             }
 
-            //// values["controller"] => must be the name of the controller not route
-            //values["id"] = "id";
-
             return new ValueTask<RouteValueDictionary>(values);
-        }
-
-        public override ValueTask<IReadOnlyList<Endpoint>> FilterAsync(HttpContext httpContext, RouteValueDictionary values, IReadOnlyList<Endpoint> endpoints)
-        {
-            return base.FilterAsync(httpContext, values, endpoints);
         }
     }
 }
