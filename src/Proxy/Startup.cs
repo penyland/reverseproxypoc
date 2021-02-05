@@ -120,13 +120,14 @@ namespace ReverseProxyPOC.Proxy
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**route}");
+                endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}");
+
+                // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**route}");
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}");
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{action}/{id?}");
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**catch-all}");
-
                 // endpoints.MapControllers();
-                // endpoints.MapReverseProxy();
+                endpoints.MapReverseProxy();
             });
         }
     }

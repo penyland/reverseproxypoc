@@ -25,12 +25,21 @@ namespace ReverseProxyPOC.Proxy.Configuration
             //    return new ValueTask<RouteValueDictionary>(values);
             //}
 
-            var value = proxyDynamicRoutesConfigurationService.GetController((string)values["route"]);
+            if (values.ContainsKey("controller") && values.ContainsKey("id"))
+            {
+                values["controller"] = "WeatherForecast";
+                values["action"] = "GetForecast";
+            }
+            else
+            {
+                var value = proxyDynamicRoutesConfigurationService.GetController((string)values["controller"]);
+
+                values["controller"] = value.Controller;
+                values["action"] = value.Action; // <= method name that we are calling
+            }
 
             //// values["controller"] => must be the name of the controller not route
-            values["controller"] = value.Controller;
-            values["action"] = value.Action; // <= method name that we are calling
-            //// values["id"] = "id";
+            //values["id"] = "id";
 
             return new ValueTask<RouteValueDictionary>(values);
         }

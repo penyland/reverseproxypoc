@@ -36,7 +36,7 @@ namespace ReverseProxyPOC.Proxy.Controllers
             .ToArray();
         }
 
-        [HttpGet("{id?}")]
+        [HttpGet("{id:int}")]
         public WeatherForecast GetForecast(int id)
         {
             var rng = new Random();
