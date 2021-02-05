@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.ReverseProxy.Service.Proxy;
 using System;
 using System.Collections.Generic;
 using System.Linq;
