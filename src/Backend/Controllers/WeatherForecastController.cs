@@ -35,5 +35,17 @@ namespace ReverseProxyPOC.Backend.Controllers
             })
             .ToArray();
         }
+
+        [HttpGet("{id:int}")]
+        public WeatherForecast GetForecast(int id)
+        {
+            var rng = new Random();
+            return new WeatherForecast
+            {
+                Date = DateTime.Now,
+                TemperatureC = rng.Next(-20, 55),
+                Summary = Summaries[rng.Next(Summaries.Length)]
+            };
+        }
     }
 }
