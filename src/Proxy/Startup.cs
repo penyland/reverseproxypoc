@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
 using ReverseProxyPOC.Proxy.Configuration;
+using ReverseProxyPOC.Proxy.Proxy;
 using ReverseProxyPOC.Proxy.Services;
 using System.Threading.Tasks;
 
@@ -28,8 +29,7 @@ namespace ReverseProxyPOC.Proxy
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddReverseProxy()
-                .LoadFromConfig(Configuration.GetSection("ReverseProxy"))
-                .AddProxyConfigFilter<CustomConfigFilter>();
+                .LoadFromConfig(Configuration.GetSection("ReverseProxy"));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -52,10 +52,11 @@ namespace ReverseProxyPOC.Proxy
             services.AddHttpProxy();
             services.AddSingleton<IProxyDynamicRoutesConfigurationService, ProxyDynamicRoutesConfigurationService>();
             services.AddSingleton<RouteValueTransformer>();
+            services.AddHostedService<RoutesRepositoryHostedService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger, IHostApplicationLifetime hostApplicationLifetime)
         {
             if (env.IsDevelopment())
             {
@@ -120,13 +121,20 @@ namespace ReverseProxyPOC.Proxy
                 endpoints.MapControllers();
                 // Map dynamic controller at order 0 so it runs before reverse proxy.
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}", state: null, order: 0);
-                endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}");
+                // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}");
+                endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}/{action?}");
 
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**route}");
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}");
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{action}/{id?}");
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**catch-all}");
             });
+
+            hostApplicationLifetime.ApplicationStarted.Register(OnApplicationStarted);
+        }
+
+        private void OnApplicationStarted()
+        {
         }
     }
 }
