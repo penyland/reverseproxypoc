@@ -1,0 +1,28 @@
+{
+  "DynamicProxyRoutes": {
+    "Endpoints": [
+      {
+        "controller": "WeatherForecast",
+        "method": "GET",
+        "action": "GetForecasts",
+        "order": 0,
+        "route": "/api/WeatherForecast",
+        "controllerMethod": "ReverseProxyPOC.Proxy.Controllers.WeatherForecastController:GetForecasts",
+        "featureFlag": null,
+        "isEnabled": false,
+        "displayName": "ReverseProxyPOC.Proxy.Controllers.WeatherForecastController.GetForecasts (Proxy)"
+      },
+      {
+        "controller": "WeatherForecast",
+        "method": "GET",
+        "action": "GetForecast",
+        "order": 0,
+        "route": "/api/WeatherForecast/{id:int}",
+        "controllerMethod": "ReverseProxyPOC.Proxy.Controllers.WeatherForecastController:GetForecast",
+        "featureFlag": null,
+        "isEnabled": false,
+        "displayName": "ReverseProxyPOC.Proxy.Controllers.WeatherForecastController.GetForecast (Proxy)"
+      }
+    ]
+  }
+}

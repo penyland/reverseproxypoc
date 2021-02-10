@@ -1,0 +1,110 @@
+[
+    {
+      "displayName": "ServiceRoute",
+      "order": 10000,
+      "controller": "",
+      "method": null,
+      "route": "/{**catch-all}",
+      "action": null,
+      "controllerMethod": null
+    },
+    {
+      "displayName": "ReverseProxyPOC.Proxy.YARP.ConfigurationUpdateController.OnConfigurationChangedAsync (Proxy)",
+      "order": 0,
+      "controller": "ConfigurationUpdate",
+      "method": "POST",
+      "route": "/api/updates",
+      "action": "OnConfigurationChanged",
+      "controllerMethod": "ReverseProxyPOC.Proxy.YARP.ConfigurationUpdateController:OnConfigurationChangedAsync"
+    },
+    {
+      "displayName": "ReverseProxyPOC.Proxy.YARP.ProxyController.Get (Proxy)",
+      "order": 0,
+      "controller": "Proxy",
+      "method": "GET",
+      "route": "/api/Proxy",
+      "action": "Get",
+      "controllerMethod": "ReverseProxyPOC.Proxy.YARP.ProxyController:Get"
+    },
+    {
+      "displayName": "ReverseProxyPOC.Proxy.YARP.ProxyController.SetProxyModeAsync (Proxy)",
+      "order": 0,
+      "controller": "Proxy",
+      "method": "POST",
+      "route": "/api/Proxy",
+      "action": "SetProxyMode",
+      "controllerMethod": "ReverseProxyPOC.Proxy.YARP.ProxyController:SetProxyModeAsync"
+    },
+    {
+      "displayName": "ReverseProxyPOC.Proxy.YARP.TestController.GetActions (Proxy)",
+      "order": 0,
+      "controller": "Test",
+      "method": "GET",
+      "route": "/api/Test/actions",
+      "action": "GetActions",
+      "controllerMethod": "ReverseProxyPOC.Proxy.YARP.TestController:GetActions"
+    },
+    {
+      "displayName": "ReverseProxyPOC.Proxy.YARP.TestController.GetPages (Proxy)",
+      "order": 0,
+      "controller": "Test",
+      "method": "GET",
+      "route": "/api/Test/pages",
+      "action": "GetPages",
+      "controllerMethod": "ReverseProxyPOC.Proxy.YARP.TestController:GetPages"
+    },
+    {
+      "displayName": "ReverseProxyPOC.Proxy.YARP.TestController.GetRoutes (Proxy)",
+      "order": 0,
+      "controller": "Test",
+      "method": "GET",
+      "route": "/api/Test/routes",
+      "action": "GetRoutes",
+      "controllerMethod": "ReverseProxyPOC.Proxy.YARP.TestController:GetRoutes"
+    },
+    {
+      "displayName": "ReverseProxyPOC.Proxy.Controllers.TodoController.GetTodoItems (Proxy)",
+      "order": 0,
+      "controller": "Todo",
+      "method": "GET",
+      "route": "/api/Todo",
+      "action": "GetTodoItems",
+      "controllerMethod": "ReverseProxyPOC.Proxy.Controllers.TodoController:GetTodoItems"
+    },
+    {
+      "displayName": "ReverseProxyPOC.Proxy.Controllers.TodoController.GetTodoItem (Proxy)",
+      "order": 0,
+      "controller": "Todo",
+      "method": "GET",
+      "route": "/api/Todo/{id}",
+      "action": "GetTodoItem",
+      "controllerMethod": "ReverseProxyPOC.Proxy.Controllers.TodoController:GetTodoItem"
+    },
+    {
+      "displayName": "ReverseProxyPOC.Proxy.Controllers.WeatherForecastController.GetForecasts (Proxy)",
+      "order": 0,
+      "controller": "WeatherForecast",
+      "method": "GET",
+      "route": "/api/WeatherForecast",
+      "action": "GetForecasts",
+      "controllerMethod": "ReverseProxyPOC.Proxy.Controllers.WeatherForecastController:GetForecasts"
+    },
+    {
+      "displayName": "ReverseProxyPOC.Proxy.Controllers.WeatherForecastController.GetForecast (Proxy)",
+      "order": 0,
+      "controller": "WeatherForecast",
+      "method": "GET",
+      "route": "/api/WeatherForecast/{id:int}",
+      "action": "GetForecast",
+      "controllerMethod": "ReverseProxyPOC.Proxy.Controllers.WeatherForecastController:GetForecast"
+    },
+    {
+      "displayName": "{controller}/{id:int?}/{action?}",
+      "order": 1,
+      "controller": "",
+      "method": null,
+      "route": "/{controller}/{id:int?}/{action?}",
+      "action": null,
+      "controllerMethod": null
+    }
+  ]

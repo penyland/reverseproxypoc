@@ -50,9 +50,9 @@ namespace ReverseProxyPOC.Proxy
             services.AddFeatureManagement();
 
             services.AddHttpProxy();
-            services.AddSingleton<IProxyDynamicRoutesConfigurationService, ProxyDynamicRoutesConfigurationService>();
-            services.AddSingleton<RouteValueTransformer>();
-            services.AddHostedService<RoutesRepositoryHostedService>();
+
+            services.ConfigureProxy(Configuration.GetSection("DynamicProxyRoutes"));
+            services.AddConfig<DynamicRouteSettings>(Configuration.GetSection("DynamicProxyRoutes"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,8 +71,6 @@ namespace ReverseProxyPOC.Proxy
                     c.RoutePrefix = "proxy/swagger";
                 });
             }
-
-            // app.UseProxyConfigurationRefresher();
 
             app.UseHttpsRedirection();
 
@@ -116,9 +114,9 @@ namespace ReverseProxyPOC.Proxy
 
             app.UseEndpoints(endpoints =>
             {
+                // endpoints.MapControllers();
                 endpoints.MapReverseProxy();
 
-                endpoints.MapControllers();
                 // Map dynamic controller at order 0 so it runs before reverse proxy.
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}", state: null, order: 0);
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}");

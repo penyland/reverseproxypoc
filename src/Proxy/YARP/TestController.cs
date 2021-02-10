@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
+using ReverseProxyPOC.Proxy.Proxy;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -96,7 +97,7 @@ namespace ReverseProxyPOC.Proxy.YARP
                 var controllerMethod = controller != null
                     ? $"{controller.ControllerTypeInfo.FullName}:{controller.MethodInfo.Name}"
                     : null;
-                return new
+                return new EndpointInfo
                 {
                     DisplayName = t.DisplayName,
                     Order = t.Order,
