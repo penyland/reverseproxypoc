@@ -1,23 +1,23 @@
 ﻿namespace ReverseProxyPOC.Proxy.Proxy
 {
-    public class EndpointInfo
+    public record EndpointInfo
     {
-        public string Controller { get; set; }
+        public string Controller { get; init; }
 
-        public string Method { get; set; }
+        public string Method { get; init; }
 
-        public string Action { get; set; }
+        public string Action { get; init; }
 
-        public int Order { get; set; }
+        public int Order { get; init; }
 
-        public string Route { get; set; }
+        public string Route { get; init; }
 
-        public string ControllerMethod { get; set; }
+        public string ControllerMethod { get; init; }
 
         public string FeatureFlag { get; set; }
 
         public bool IsEnabled { get; set; }
 
-        public string DisplayName { get; internal set; }
+        public string DisplayName { get; init; }
     }
 }

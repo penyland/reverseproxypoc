@@ -39,6 +39,7 @@ namespace ReverseProxyPOC.Proxy.Configuration
                 var components = httpContext.RequestServices.GetServices<IHttpRequestFeature>();
 
                 var routeData = httpContext.GetRouteData();
+                var endpoint = httpContext.GetEndpoint();
                 var httpRequestFeature = httpContext.Features.Get<IHttpRequestFeature>();
                 var routeValuesFeature = httpContext.Features.Get<IRouteValuesFeature>();
                 var routesValues = routeValuesFeature.RouteValues;
@@ -51,9 +52,9 @@ namespace ReverseProxyPOC.Proxy.Configuration
                 var method = httpRequestFeature.Method;
                 var path = httpRequestFeature.Path;
 
-                var endpoint = proxyDynamicRoutesConfigurationService.ResolveDynamicEndpoint(controller, method, path);
+                var dynamicEndpointInfo = proxyDynamicRoutesConfigurationService.ResolveDynamicEndpoint(controller, method, path);
 
-                if (endpoint == null)
+                if (dynamicEndpointInfo == null)
                 {
                     values["controller"] = string.Empty;
                     values["action"] = string.Empty;
@@ -62,8 +63,8 @@ namespace ReverseProxyPOC.Proxy.Configuration
                 }
                 else
                 {
-                    values["controller"] = endpoint.Controller; // <= must be the name of the controller not route
-                    values["action"] = endpoint.Action; // <= method name that we are calling
+                    values["controller"] = dynamicEndpointInfo.Controller; // <= must be the name of the controller not route
+                    values["action"] = dynamicEndpointInfo.Action; // <= method name that we are calling
                 }
 
                 // Check if endpoint is enabled in configuration or not
