@@ -55,6 +55,9 @@ namespace ReverseProxyPOC.Proxy.Configuration
 
                 if (endpoint == null)
                 {
+                    values["controller"] = string.Empty;
+                    values["action"] = string.Empty;
+                    values["id"] = string.Empty;
                     return new ValueTask<RouteValueDictionary>(values);
                 }
                 else

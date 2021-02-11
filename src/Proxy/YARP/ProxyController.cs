@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace ReverseProxyPOC.Proxy.YARP
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("proxy/[controller]")]
     public class ProxyController : ControllerBase
     {
         private readonly IProxyDynamicRoutesConfigurationService proxyConfigurationService;

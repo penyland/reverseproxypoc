@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using System;
 
 namespace ReverseProxyPOC.Proxy
 {
@@ -11,7 +12,26 @@ namespace ReverseProxyPOC.Proxy
         public static void Main(string[] args)
         {
             // AppContext.SetSwitch("Microsoft.AspNetCore.Routing.UseCorrectCatchAllBehavior", true);
-            CreateHostBuilder(args).Build().Run();
+            try
+            {
+                CreateHostBuilder(args).Build().Run();
+            }
+            catch (Exception ex)
+            {
+                if (Log.Logger == null || Log.Logger.GetType().Name == "SilentLogger")
+                {
+                    Log.Logger = new LoggerConfiguration()
+                        .MinimumLevel.Debug()
+                        .WriteTo.Console()
+                        .CreateLogger();
+                }
+
+                Log.Fatal(ex, "Host terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -44,9 +64,12 @@ namespace ReverseProxyPOC.Proxy
                           .Select(keyFilter: "ProxyPOC:*", labelFilter: "Development");
                     });
                 })
-                .UseSerilog((context, config) =>
+                .UseSerilog((context, loggerConfiguration) =>
                 {
-                    config.ReadFrom.Configuration(context.Configuration);
+                    loggerConfiguration
+                        .ReadFrom.Configuration(context.Configuration)
+                        .Enrich.FromLogContext()
+                        .Enrich.WithProperty("Environment", context.HostingEnvironment);
                 });
     }
 }

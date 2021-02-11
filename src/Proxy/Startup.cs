@@ -120,7 +120,7 @@ namespace ReverseProxyPOC.Proxy
                 // Map dynamic controller at order 0 so it runs before reverse proxy.
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}", state: null, order: 0);
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}");
-                endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}/{action?}");
+                endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}/{action?}", state: null, order: 0);
 
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**route}");
                 // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}");

@@ -49,24 +49,23 @@ namespace ReverseProxyPOC.Proxy.Services
 
         public EndpointInfo ResolveDynamicEndpoint(string controller, string method, string path)
         {
-            var routeEndpoints = endpointSources.SelectMany(e => e.Endpoints).OfType<RouteEndpoint>();
-
-            var routeValues = new RouteValueDictionary();
-            string localPath = path; // new Uri(path).LocalPath;
-
-            var matchedEndpoint = routeEndpoints.Where(e => new TemplateMatcher(
-                                                                    TemplateParser.Parse(e.RoutePattern.RawText),
-                                                                    new RouteValueDictionary())
-                                                            .TryMatch(localPath, routeValues))
-                                            .OrderBy(c => c.Order)
-                                            .FirstOrDefault();
+            var split = path.TrimStart('/').Split('/');
 
             var all1 = this.settings.Endpoints.Where(t => t.Method == method);
             var all2 = all1.Where(t => t.Controller == controller);
-            var all3 = all2.Where(t => t.Route == path);
+
+            var routeTemplate = TemplateParser.Parse(all2.ToArray()[3].Route);
+
+            var all3 = all2.Where(t => t.Route == routeTemplate.TemplateText);
+
+            if (all3.FirstOrDefault().IsEnabled)
+            {
+                return all3.FirstOrDefault();
+            }
+
+            return null;
 
             // var t = this.settings.Endpoints.Where(t => t.Route == route).FirstOrDefault();
-            return all3.FirstOrDefault();
         }
 
         public void Initialize()
