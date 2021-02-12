@@ -10,7 +10,7 @@
 
         public int Order { get; init; }
 
-        public string Route { get; init; }
+        public string RoutePattern { get; init; }
 
         public string ControllerMethod { get; init; }
 

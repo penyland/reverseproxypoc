@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Routing.Template;
-using Microsoft.Extensions.Configuration;
 using ReverseProxyPOC.Proxy.Proxy;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,63 +9,32 @@ namespace ReverseProxyPOC.Proxy.Services
     public class ProxyDynamicRoutesConfigurationService : IProxyDynamicRoutesConfigurationService
     {
         private readonly IEnumerable<EndpointDataSource> endpointSources;
-        private readonly LinkParser linkParser;
-        private readonly IConfiguration configuration;
         private readonly DynamicRouteSettings settings;
-        private Dictionary<string, object> routes = new Dictionary<string, object>();
+        private Dictionary<string, EndpointInfo> routes = new Dictionary<string, EndpointInfo>();
 
         public ProxyDynamicRoutesConfigurationService(
             IEnumerable<EndpointDataSource> endpointSources,
-            LinkParser linkParser,
-            IConfiguration configuration,
             DynamicRouteSettings settings)
         {
             this.endpointSources = endpointSources ?? throw new System.ArgumentNullException(nameof(endpointSources));
-            this.linkParser = linkParser;
-            this.configuration = configuration;
             this.settings = settings;
-
-            // TODO: Check if endpointSources are populated. Merge lists
 
             Initialize();
         }
 
-        public (string Controller, string Action) GetController(string route)
+        public bool IsEnabled(string routeName)
         {
-            return route switch
+            if (routes.TryGetValue(routeName, out var value))
             {
-                "WeatherForecast" => ("WeatherForecast", "GetForecasts"),
-                "WeatherForecast/2" => ("WeatherForecast", "GetForecast"),
-                "api/WeatherForecast" => ("WeatherForecast", "GetForecast"),
-                "api/proxy" => ("Proxy", "Get"),
-                "Todo" => ("Todo", "GetTodoItems"),
-
-                _ => (route, string.Empty)
-            };
-        }
-
-        public EndpointInfo ResolveDynamicEndpoint(string controller, string method, string path)
-        {
-            var split = path.TrimStart('/').Split('/');
-
-            var all1 = this.settings.Endpoints.Where(t => t.Method == method);
-            var all2 = all1.Where(t => t.Controller == controller);
-
-            var routeTemplate = TemplateParser.Parse(all2.ToArray()[3].Route);
-
-            var all3 = all2.Where(t => t.Route == routeTemplate.TemplateText);
-
-            if (all3.FirstOrDefault().IsEnabled)
-            {
-                return all3.FirstOrDefault();
+                return value.IsEnabled;
             }
-
-            return null;
-
-            // var t = this.settings.Endpoints.Where(t => t.Route == route).FirstOrDefault();
+            else
+            {
+                return false;
+            }
         }
 
-        public void Initialize()
+        private void Initialize()
         {
             var endpoints = endpointSources
                 .SelectMany(e => e.Endpoints)
@@ -91,15 +57,22 @@ namespace ReverseProxyPOC.Proxy.Services
                     Order = e.Order,
                     Controller = controller?.ControllerName ?? string.Empty,
                     Method = e.Metadata.OfType<HttpMethodMetadata>().FirstOrDefault()?.HttpMethods?[0],
-                    Route = $"/{e.RoutePattern.RawText.TrimStart('/')}",
+                    RoutePattern = $"/{e.RoutePattern.RawText.TrimStart('/')}",
                     Action = action,
-                    ControllerMethod = controllerMethod
+                    ControllerMethod = controllerMethod,
+                    DisplayName = e.DisplayName
                 };
             });
 
-            settings.Endpoints.AddRange(result);
-        }
+            routes = result.ToDictionary(t => t.DisplayName, t => t);
 
-        internal bool IsEnabled() => true;
+            foreach (var route in settings.Endpoints)
+            {
+                if (routes.ContainsKey(route.DisplayName))
+                {
+                    routes[route.DisplayName] = route;
+                }
+            }
+        }
     }
 }

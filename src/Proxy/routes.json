@@ -20,7 +20,7 @@
         "route": "/api/WeatherForecast/{id:int}",
         "controllerMethod": "ReverseProxyPOC.Proxy.Controllers.WeatherForecastController:GetForecast",
         "featureFlag": null,
-        "isEnabled": false,
+        "isEnabled": true,
         "displayName": "ReverseProxyPOC.Proxy.Controllers.WeatherForecastController.GetForecast (Proxy)"
       }
     ]

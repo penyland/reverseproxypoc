@@ -7,12 +7,12 @@ using System.Linq;
 namespace ReverseProxyPOC.Proxy.Controllers
 {
     [ApiController]
-    [Route("[controller]", Order = 2)]
+    [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
         {
-            "Proxy Freezing", "Proxy Bracing", "Proxy Chilly", "Proxy Cool", "Proxy Mild", "Proxy Warm", "Proxy Balmy", "Proxy Hot", "Proxy Sweltering", "Proxy Scorching"
+            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
         private readonly ILogger<WeatherForecastController> _logger;

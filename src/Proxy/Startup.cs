@@ -1,18 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
-using ReverseProxyPOC.Proxy.Configuration;
 using ReverseProxyPOC.Proxy.Proxy;
-using ReverseProxyPOC.Proxy.Services;
-using System.Threading.Tasks;
 
 namespace ReverseProxyPOC.Proxy
 {
@@ -80,59 +74,13 @@ namespace ReverseProxyPOC.Proxy
 
             app.UseCors();
 
-            app.Use((context, next) =>
-            {
-                var endpoint = context.GetEndpoint();
-                if (endpoint is null)
-                {
-                    return Task.CompletedTask;
-                }
-
-                logger.LogInformation($"Endpoint: {endpoint.DisplayName}");
-
-                if (endpoint is RouteEndpoint routeEndpoint)
-                {
-                    logger.LogInformation("Endpoint has route pattern: " +
-                        routeEndpoint.RoutePattern.RawText);
-                }
-
-                return next();
-            });
-
-            app.Use((context, next) =>
-            {
-                var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
-                var endpoint = endpointFeature?.Endpoint;
-
-                if (endpoint != null)
-                {
-                    var routePattern = (endpoint as RouteEndpoint)?.RoutePattern.RawText;
-                }
-
-                return next();
-            });
+            app.UseMiddleware<ProxyDynamicEndpointsMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
-                // endpoints.MapControllers();
+                endpoints.MapControllers();
                 endpoints.MapReverseProxy();
-
-                // Map dynamic controller at order 0 so it runs before reverse proxy.
-                // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}", state: null, order: 0);
-                // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}");
-                endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{id:int?}/{action?}", state: null, order: 0);
-
-                // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**route}");
-                // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}");
-                // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{controller}/{action}/{id?}");
-                // endpoints.MapDynamicControllerRoute<RouteValueTransformer>("{**catch-all}");
             });
-
-            hostApplicationLifetime.ApplicationStarted.Register(OnApplicationStarted);
-        }
-
-        private void OnApplicationStarted()
-        {
         }
     }
 }

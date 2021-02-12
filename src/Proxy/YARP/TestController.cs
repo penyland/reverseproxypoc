@@ -103,7 +103,7 @@ namespace ReverseProxyPOC.Proxy.YARP
                     Order = t.Order,
                     Controller = controller?.ControllerName ?? string.Empty,
                     Method = t.Metadata.OfType<HttpMethodMetadata>().FirstOrDefault()?.HttpMethods?[0],
-                    Route = $"/{t.RoutePattern.RawText.TrimStart('/')}",
+                    RoutePattern = $"/{t.RoutePattern.RawText.TrimStart('/')}",
                     Action = action,
                     ControllerMethod = controllerMethod
                 };

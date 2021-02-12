@@ -2,7 +2,7 @@ using System;
 
 namespace ReverseProxyPOC.Proxy.Controllers
 {
-    public class WeatherForecast
+    public record WeatherForecast
     {
         public DateTime Date { get; set; }
 
