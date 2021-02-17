@@ -1,7 +1,37 @@
 ﻿@page "/"
+@inject HttpClient Http
 
-<h1>Hello, world!</h1>
+<h1>Endpoints</h1>
 
-Welcome to your new app.
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Controller</th>
+            <th>Action</th>
+            <th>Method</th>
+            <th>IsEnabled</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var endpoint in endpoints)
+        {
+            <tr>
+                <td>@endpoint.DisplayName</td>
+                <td>@endpoint.Controller</td>
+                <td>@endpoint.Action</td>
+                <td>@endpoint.ControllerMethod</td>
+                <td>@endpoint.IsEnabled</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    private List<EndpointInfo> endpoints = new List<EndpointInfo>();
+
+    protected override Task OnInitializedAsync() => GetEndpointInfosAsync(); //endpointsService.GetEndpointsAsync();
+
+    private async Task GetEndpointInfosAsync() => endpoints = 
+        await Http.GetFromJsonAsync<List<EndpointInfo>>("https://localhost:44368/proxy/endpoints");
+}
