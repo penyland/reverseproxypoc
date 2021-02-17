@@ -2,14 +2,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.ReverseProxy.Service;
+using ReverseProxyPOC.Proxy.Proxy;
 using ReverseProxyPOC.Proxy.Services;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ReverseProxyPOC.Proxy.YARP
 {
     [ApiController]
-    [Route("proxy/[controller]")]
+    [Route("[controller]")]
+    [Produces("application/json")]
     public class ProxyController : ControllerBase
     {
         private readonly IProxyDynamicRoutesConfigurationService proxyConfigurationService;
@@ -52,6 +55,13 @@ namespace ReverseProxyPOC.Proxy.YARP
             await Task.FromResult<object>(null);
 
             return Ok(config);
+        }
+
+        [HttpGet("endpoints")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<EndpointInfo>))]
+        public IActionResult GetEndpoints()
+        {
+            return Ok(this.proxyConfigurationService.Endpoints);
         }
     }
 }

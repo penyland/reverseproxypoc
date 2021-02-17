@@ -111,6 +111,5 @@ namespace ReverseProxyPOC.Proxy.YARP
 
             return Ok(result);
         }
-
     }
 }

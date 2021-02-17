@@ -50,19 +50,21 @@ namespace ReverseProxyPOC.Proxy
                     config.AddJsonFile("routes.json");
 
                     var settings = config.Build();
-                    var connection = settings.GetConnectionString("AppConfig");
 
-                    config.AddAzureAppConfiguration(options =>
+                    if (!string.IsNullOrEmpty(settings.GetConnectionString("AppConfig")))
                     {
-                        options
-                          .Connect(connection)
-                          .UseFeatureFlags()
-                          // Load configuration values with no label
-                          .Select(KeyFilter.Any, LabelFilter.Null)
-                          // Override with any configuration values specific to current hosting env
-                          .Select(KeyFilter.Any, context.HostingEnvironment.EnvironmentName)
-                          .Select(keyFilter: "ProxyPOC:*", labelFilter: "Development");
-                    });
+                        config.AddAzureAppConfiguration(options =>
+                        {
+                            options
+                                .Connect(settings.GetConnectionString("AppConfig"))
+                                .UseFeatureFlags()
+                                // Load configuration values with no label
+                                .Select(KeyFilter.Any, LabelFilter.Null)
+                                // Override with any configuration values specific to current hosting env
+                                .Select(KeyFilter.Any, context.HostingEnvironment.EnvironmentName)
+                                .Select(keyFilter: "ProxyPOC:*", labelFilter: "Development");
+                        });
+                    }
                 })
                 .UseSerilog((context, loggerConfiguration) =>
                 {

@@ -10,7 +10,7 @@ namespace ReverseProxyPOC.Proxy.Services
     {
         private readonly IEnumerable<EndpointDataSource> endpointSources;
         private readonly DynamicRouteSettings settings;
-        private Dictionary<string, EndpointInfo> routes = new Dictionary<string, EndpointInfo>();
+        private Dictionary<string, EndpointInfo> endpoints = new Dictionary<string, EndpointInfo>();
 
         public ProxyDynamicRoutesConfigurationService(
             IEnumerable<EndpointDataSource> endpointSources,
@@ -22,25 +22,28 @@ namespace ReverseProxyPOC.Proxy.Services
             Initialize();
         }
 
-        public bool IsEnabled(string routeName)
+        public IEnumerable<EndpointInfo> Endpoints { get; set; }
+
+        public bool IsEnabled(RouteEndpoint routeEndpoint)
         {
-            if (routes.TryGetValue(routeName, out var value))
+            if (endpoints.TryGetValue(routeEndpoint.DisplayName, out var value))
             {
                 return value.IsEnabled;
             }
             else
             {
-                return false;
+                return true;
             }
         }
 
         private void Initialize()
         {
-            var endpoints = endpointSources
+            var routeEndpoints = endpointSources
                 .SelectMany(e => e.Endpoints)
-                .OfType<RouteEndpoint>();
+                .OfType<RouteEndpoint>()
+                .Where(t => t.Metadata.OfType<EnableApiEndpointAttribute>().Any());
 
-            var result = endpoints.Select(e =>
+            var result = routeEndpoints.Select(e =>
             {
                 var controller = e.Metadata
                     .OfType<ControllerActionDescriptor>()
@@ -64,15 +67,17 @@ namespace ReverseProxyPOC.Proxy.Services
                 };
             });
 
-            routes = result.ToDictionary(t => t.DisplayName, t => t);
+            this.endpoints = result.ToDictionary(t => t.DisplayName, t => t);
 
             foreach (var route in settings.Endpoints)
             {
-                if (routes.ContainsKey(route.DisplayName))
+                if (this.endpoints.ContainsKey(route.DisplayName))
                 {
-                    routes[route.DisplayName] = route;
+                    this.endpoints[route.DisplayName] = route;
                 }
             }
+
+            this.Endpoints = this.endpoints.Values.ToList();
         }
     }
 }

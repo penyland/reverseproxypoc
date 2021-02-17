@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ReverseProxyPOC.Proxy.Proxy;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,7 @@ namespace ReverseProxyPOC.Proxy.Controllers
         }
 
         [HttpGet]
+        [EnableApiEndpoint]
         public IEnumerable<WeatherForecast> GetForecasts()
         {
             _logger.LogInformation("GetWeatherForecasts");
@@ -37,6 +39,7 @@ namespace ReverseProxyPOC.Proxy.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [EnableApiEndpoint]
         public WeatherForecast GetForecast(int id)
         {
             var rng = new Random();

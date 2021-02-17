@@ -1,7 +1,13 @@
-﻿namespace ReverseProxyPOC.Proxy.Services
+﻿using Microsoft.AspNetCore.Routing;
+using ReverseProxyPOC.Proxy.Proxy;
+using System.Collections.Generic;
+
+namespace ReverseProxyPOC.Proxy.Services
 {
     public interface IProxyDynamicRoutesConfigurationService
     {
-        bool IsEnabled(string routeName);
+        IEnumerable<EndpointInfo> Endpoints { get; set; }
+
+        bool IsEnabled(RouteEndpoint routeEndpoint);
     }
 }

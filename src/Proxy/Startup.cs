@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -41,6 +42,8 @@ namespace ReverseProxyPOC.Proxy
                 });
             });
 
+            services.AddHealthChecks();
+
             services.AddFeatureManagement();
 
             services.AddHttpProxy();
@@ -80,6 +83,13 @@ namespace ReverseProxyPOC.Proxy
             {
                 endpoints.MapControllers();
                 endpoints.MapReverseProxy();
+
+                endpoints.MapHealthChecks("/api/health");
+
+                endpoints.MapGet("/peter", async context =>
+                {
+                    await context.Response.WriteAsync("Hello World!");
+                });
             });
         }
     }

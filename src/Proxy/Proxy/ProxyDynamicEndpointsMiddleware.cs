@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.ReverseProxy.Middleware;
 using ReverseProxyPOC.Proxy.Services;
 using System;
 using System.Collections.Generic;
@@ -13,26 +15,26 @@ namespace ReverseProxyPOC.Proxy.Proxy
     {
         private const string ReverseProxyRouteId = "ServiceRoute";
         private readonly RequestDelegate next;
-        private readonly IProxyDynamicRoutesConfigurationService proxyDynamicRoutesConfigurationService;
-        private readonly IEnumerable<EndpointDataSource> endpointSources;
+        private readonly IProxyDynamicRoutesConfigurationService apiEndpointConfigurationService;
         private readonly ILogger logger;
-        private readonly List<RouteEndpoint> endpoints;
+        private readonly IConfiguration configuration;
+        private readonly IEnumerable<RouteEndpoint> endpoints;
 
         public ProxyDynamicEndpointsMiddleware(
             RequestDelegate next,
             IProxyDynamicRoutesConfigurationService proxyDynamicRoutesConfigurationService,
             IEnumerable<EndpointDataSource> endpointSources,
-            ILogger<ProxyDynamicEndpointsMiddleware> logger)
+            ILogger<ProxyDynamicEndpointsMiddleware> logger,
+            IConfiguration configuration)
         {
             this.next = next;
-            this.proxyDynamicRoutesConfigurationService = proxyDynamicRoutesConfigurationService;
-            this.endpointSources = endpointSources;
+            this.apiEndpointConfigurationService = proxyDynamicRoutesConfigurationService;
             this.logger = logger;
+            this.configuration = configuration;
 
             endpoints = endpointSources
                 .SelectMany(e => e.Endpoints)
-                .OfType<RouteEndpoint>()
-                .ToList();
+                .OfType<RouteEndpoint>();
         }
 
         public async Task Invoke(HttpContext context)
@@ -42,22 +44,30 @@ namespace ReverseProxyPOC.Proxy.Proxy
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var endpoint = context.GetEndpoint();
+            var endpoint = (RouteEndpoint)context.GetEndpoint();
             if (endpoint is null)
             {
                 return;
             }
 
-            var selectedEndpoint = endpoints.Where(t => t.DisplayName == context.GetEndpoint().DisplayName).First();
+            // Make sure reverse proxy is added
+            var routeId = configuration["ReverseProxy:Routes:0:RouteId"];
 
-            if (!proxyDynamicRoutesConfigurationService.IsEnabled(selectedEndpoint.DisplayName))
+            var attribute = endpoint.Metadata.GetMetadata<EnableApiEndpointAttribute>();
+            if (attribute != null)
             {
-                logger.LogInformation($"Endpoint \x1B[1m\x1B[36m'{selectedEndpoint.DisplayName}'\x1B[37m is not enabled.");
+                var isEnabled = attribute.IsEnabled;
+                logger.LogInformation($"Endpoint \x1B[1m\x1B[36m'{endpoint.DisplayName}'\x1B[37m is NOT enabled.");
 
-                var yarpEndpoint = endpoints.Where(t => t.DisplayName == ReverseProxyRouteId).First();
-                logger.LogInformation($"Changing endpoint to \x1B[1m\x1B[36m'{yarpEndpoint.DisplayName}'\x1B[37m");
+                if (!apiEndpointConfigurationService.IsEnabled(endpoint))
+                {
+                    logger.LogInformation($"Endpoint \x1B[1m\x1B[36m'{endpoint.DisplayName}'\x1B[37m is NOT enabled in configuration.");
 
-                context.SetEndpoint(yarpEndpoint);
+                    var serviceRouteEndpoint = endpoints.Where(t => t.DisplayName == ReverseProxyRouteId).First();
+                    logger.LogInformation($"Changing endpoint to \x1B[1m\x1B[36m'{serviceRouteEndpoint.DisplayName}'\x1B[37m");
+
+                    context.SetEndpoint(serviceRouteEndpoint);
+                }
             }
 
             await next(context);
