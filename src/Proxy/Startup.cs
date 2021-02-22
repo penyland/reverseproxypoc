@@ -77,7 +77,7 @@ namespace ReverseProxyPOC.Proxy
 
             app.UseCors();
 
-            app.UseMiddleware<ProxyDynamicEndpointsMiddleware>();
+            app.UseMiddleware<EndpointSwitchingMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
@@ -85,11 +85,6 @@ namespace ReverseProxyPOC.Proxy
                 endpoints.MapReverseProxy();
 
                 endpoints.MapHealthChecks("/api/health");
-
-                endpoints.MapGet("/peter", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
             });
         }
     }

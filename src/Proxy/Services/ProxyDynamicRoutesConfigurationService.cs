@@ -41,7 +41,7 @@ namespace ReverseProxyPOC.Proxy.Services
             var routeEndpoints = endpointSources
                 .SelectMany(e => e.Endpoints)
                 .OfType<RouteEndpoint>()
-                .Where(t => t.Metadata.OfType<EnableApiEndpointAttribute>().Any());
+                .Where(t => t.Metadata.OfType<EndpointFeatureGateAttribute>().Any());
 
             var result = routeEndpoints.Select(e =>
             {

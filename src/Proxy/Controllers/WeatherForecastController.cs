@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement.Mvc;
 using ReverseProxyPOC.Proxy.Proxy;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace ReverseProxyPOC.Proxy.Controllers
         }
 
         [HttpGet]
-        [EnableApiEndpoint]
+        [EndpointFeatureGate(features: FeatureFlags.WeatherForecasts)]
         public IEnumerable<WeatherForecast> GetForecasts()
         {
             _logger.LogInformation("GetWeatherForecasts");
@@ -39,7 +40,7 @@ namespace ReverseProxyPOC.Proxy.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [EnableApiEndpoint]
+        [EndpointFeatureGate(features: FeatureFlags.WeatherForecast)]
         public WeatherForecast GetForecast(int id)
         {
             var rng = new Random();
