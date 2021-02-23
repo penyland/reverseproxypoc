@@ -44,7 +44,7 @@ namespace ReverseProxyPOC.Proxy
 
             services.AddHealthChecks();
 
-            services.AddFeatureManagement();
+            services.AddFeatureManagement().UseDisabledFeaturesHandler(new DisabledEndpointHandler());
 
             services.AddHttpProxy();
 

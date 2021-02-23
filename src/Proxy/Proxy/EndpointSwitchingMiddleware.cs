@@ -41,7 +41,7 @@ namespace ReverseProxyPOC.Proxy.Proxy
                 .OfType<RouteEndpoint>();
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             if (context == null)
             {
@@ -92,9 +92,9 @@ namespace ReverseProxyPOC.Proxy.Proxy
                     else
                     {
                         logger.LogInformation($"Proxying NOT allowed for Endpoint \x1B[1m\x1B[36m'{endpoint.DisplayName}.'\x1B[37m");
-                        var disabledFeaturesHandler = context.RequestServices.GetService<IDisabledEndpointHandler>() ?? new DisabledEndpointHandler();
-                        await disabledFeaturesHandler.HandleDisabledFeatures(attribute.Features, context).ConfigureAwait(false);
-                        return;
+                    //    var disabledFeaturesHandler = context.RequestServices.GetService<IDisabledEndpointHandler>() ?? new DisabledEndpointHandler();
+                    //    await disabledFeaturesHandler.HandleDisabledFeatures(attribute.Features, context).ConfigureAwait(false);
+                    //    return;
                     }
                 }
             }

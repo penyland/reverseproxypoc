@@ -1,6 +1,11 @@
-﻿using Microsoft.FeatureManagement;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FeatureManagement;
+using Microsoft.FeatureManagement.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ReverseProxyPOC.Proxy.Proxy
 {
@@ -8,7 +13,7 @@ namespace ReverseProxyPOC.Proxy.Proxy
     /// An attribute that can be placed on controllers and actions to require all or any of a set of features to be enabled.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-    public class EndpointFeatureGateAttribute : Attribute
+    public class EndpointFeatureGateAttribute : ActionFilterAttribute
     {
         // ProxyAwareFeatureGateAttribute
         // EndpointIsEnabledAttribute
@@ -110,5 +115,32 @@ namespace ReverseProxyPOC.Proxy.Proxy
         /// Controls whether the route are allowed through the proxy or not.
         /// </summary>
         public bool ProxyingAllowed { get; }
+
+        /// <summary>
+        /// Performs controller action pre-procesing to ensure that at least one of the specified features are enabled.
+        /// </summary>
+        /// <param name="context">The context of the MVC action.</param>
+        /// <param name="next">The action delegate.</param>
+        /// <returns>Returns a task representing the action execution unit of work.</returns>
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            var featureManager = context.HttpContext.RequestServices.GetRequiredService<IFeatureManagerSnapshot>();
+
+            // Enabled state is determined by either 'any' or 'all' features being enabled.
+            bool enabled = RequirementType == RequirementType.All ?
+                             await Features.All(async feature => await featureManager.IsEnabledAsync(feature).ConfigureAwait(false)) :
+                             await Features.Any(async feature => await featureManager.IsEnabledAsync(feature).ConfigureAwait(false));
+
+            if (enabled)
+            {
+                await next().ConfigureAwait(false);
+            }
+            else
+            {
+                var disabledFeaturesHandler = context.HttpContext.RequestServices.GetService<IDisabledFeaturesHandler>() ?? new NotFoundDisabledFeaturesHandler();
+
+                await disabledFeaturesHandler.HandleDisabledFeatures(Features, context).ConfigureAwait(false);
+            }
+        }
     }
 }
