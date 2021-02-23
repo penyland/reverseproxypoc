@@ -63,5 +63,11 @@ namespace ReverseProxyPOC.Proxy.YARP
         {
             return Ok(this.proxyConfigurationService.Endpoints);
         }
+
+        [HttpGet("configuration")]
+        public IActionResult GetConfiguration()
+        {
+            return Ok(this.configuration.GetDebugView());
+        }
     }
 }
