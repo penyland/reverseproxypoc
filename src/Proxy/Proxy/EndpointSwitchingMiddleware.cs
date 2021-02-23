@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
+using Microsoft.FeatureManagement.Mvc;
 using ReverseProxyPOC.Proxy.Services;
 using System;
 using System.Collections.Generic;
@@ -59,17 +60,12 @@ namespace ReverseProxyPOC.Proxy.Proxy
                 case RouteEndpoint routeEndpoint:
                     logger.LogInformation($"Endpoint Display Name: {routeEndpoint.DisplayName}");
                     logger.LogInformation($"Endpoint Route Pattern: {routeEndpoint.RoutePattern.RawText}");
-
-                    foreach (var type in routeEndpoint.Metadata.Select(md => md.GetType()))
-                    {
-                        logger.LogInformation($"{type}");
-                    }
-
                     break;
                 case null:
                     break;
             }
 
+            var gate = endpoint.Metadata.GetMetadata<FeatureGateAttribute>();
             var attribute = endpoint.Metadata.GetMetadata<EndpointFeatureGateAttribute>();
             if (attribute != null)
             {
@@ -80,7 +76,10 @@ namespace ReverseProxyPOC.Proxy.Proxy
                 {
                     logger.LogInformation($"Endpoint \x1B[1m\x1B[36m'{endpoint.DisplayName}'\x1B[37m is NOT enabled in configuration.");
 
-                    if (attribute.ProxyingAllowed)
+                    // Invoke endpoint and let the feature gate execute.
+                    await next(context).ConfigureAwait(false);
+
+                    if (attribute.ProxyingAllowed && !context.Response.HasStarted)
                     {
                         logger.LogInformation($"Proxying Allowed for Endpoint \x1B[1m\x1B[36m'{endpoint.DisplayName}.'\x1B[37m");
 
@@ -92,9 +91,6 @@ namespace ReverseProxyPOC.Proxy.Proxy
                     else
                     {
                         logger.LogInformation($"Proxying NOT allowed for Endpoint \x1B[1m\x1B[36m'{endpoint.DisplayName}.'\x1B[37m");
-                    //    var disabledFeaturesHandler = context.RequestServices.GetService<IDisabledEndpointHandler>() ?? new DisabledEndpointHandler();
-                    //    await disabledFeaturesHandler.HandleDisabledFeatures(attribute.Features, context).ConfigureAwait(false);
-                    //    return;
                     }
                 }
             }

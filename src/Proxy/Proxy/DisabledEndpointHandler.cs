@@ -18,7 +18,11 @@ namespace ReverseProxyPOC.Proxy.Proxy
 
         public Task HandleDisabledFeatures(IEnumerable<string> features, ActionExecutingContext context)
         {
-            context.Result = new StatusCodeResult(StatusCodes.Status405MethodNotAllowed);
+            var attribute = context.HttpContext.GetEndpoint().Metadata.GetMetadata<EndpointFeatureGateAttribute>();
+            if (attribute != null && !attribute.ProxyingAllowed)
+            {
+                context.Result = new StatusCodeResult(StatusCodes.Status405MethodNotAllowed);
+            }
 
             return Task.CompletedTask;
         }

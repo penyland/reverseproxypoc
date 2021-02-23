@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
 using ReverseProxyPOC.Proxy.Proxy;
+using ReverseProxyPOC.Proxy.Proxy.Filters;
 
 namespace ReverseProxyPOC.Proxy
 {
@@ -44,7 +44,9 @@ namespace ReverseProxyPOC.Proxy
 
             services.AddHealthChecks();
 
-            services.AddFeatureManagement().UseDisabledFeaturesHandler(new DisabledEndpointHandler());
+            services.AddFeatureManagement()
+                .AddFeatureFilter<ProxyAllowedFilter>()
+                .UseDisabledFeaturesHandler(new DisabledEndpointHandler());
 
             services.AddHttpProxy();
 
@@ -78,6 +80,7 @@ namespace ReverseProxyPOC.Proxy
             app.UseCors();
 
             app.UseMiddleware<EndpointSwitchingMiddleware>();
+            // app.UseMiddlewareForFeature<EndpointSwitchingMiddleware>(nameof(FeatureFlags.EndpointSwitching));
 
             app.UseEndpoints(endpoints =>
             {

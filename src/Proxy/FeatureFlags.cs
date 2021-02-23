@@ -3,6 +3,8 @@
     public enum FeatureFlags
     {
         WeatherForecast,
-        WeatherForecasts
+        WeatherForecasts,
+        EndpointSwitching,
+        ProxyingAllowed
     }
 }
