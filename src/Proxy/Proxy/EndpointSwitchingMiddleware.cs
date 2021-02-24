@@ -66,20 +66,17 @@ namespace ReverseProxyPOC.Proxy.Proxy
             }
 
             var gate = endpoint.Metadata.GetMetadata<FeatureGateAttribute>();
-            var attribute = endpoint.Metadata.GetMetadata<EndpointFeatureGateAttribute>();
+            var attribute = endpoint.Metadata.GetMetadata<EndpointEnabledAttribute>();
             if (attribute != null)
             {
-                IFeatureManager featureManager = context.RequestServices.GetRequiredService<IFeatureManagerSnapshot>();
-                var isEnabled = await featureManager.IsEnabledAsync(attribute.Features.First());
+                //IFeatureManager featureManager = context.RequestServices.GetRequiredService<IFeatureManagerSnapshot>();
+                //var isEnabled = await featureManager.IsEnabledAsync(attribute.Features.First());
 
-                if (!isEnabled)
+                if (!attribute.IsEnabled)
                 {
                     logger.LogInformation($"Endpoint \x1B[1m\x1B[36m'{endpoint.DisplayName}'\x1B[37m is NOT enabled in configuration.");
 
-                    // Invoke endpoint and let the feature gate execute.
-                    await next(context).ConfigureAwait(false);
-
-                    if (attribute.ProxyingAllowed && !context.Response.HasStarted)
+                    if (attribute.ProxyingAllowed)
                     {
                         logger.LogInformation($"Proxying Allowed for Endpoint \x1B[1m\x1B[36m'{endpoint.DisplayName}.'\x1B[37m");
 

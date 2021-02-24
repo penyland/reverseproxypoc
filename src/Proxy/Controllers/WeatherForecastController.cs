@@ -25,8 +25,9 @@ namespace ReverseProxyPOC.Proxy.Controllers
         }
 
         [HttpGet]
-        //[EndpointFeatureGate(features: FeatureFlags.WeatherForecasts)]
-        [EndpointFeatureGate(Microsoft.FeatureManagement.RequirementType.All, true, FeatureFlags.ProxyingAllowed, FeatureFlags.WeatherForecasts)]
+        [EndpointEnabledAttribute]
+        // [EndpointFeatureGate(features: FeatureFlags.ProxyingAllowed)]
+        [FeatureGate(Microsoft.FeatureManagement.RequirementType.All, true, FeatureFlags.ProxyingAllowed, FeatureFlags.WeatherForecasts)]
         public IEnumerable<WeatherForecast> GetForecasts()
         {
             _logger.LogInformation("GetWeatherForecasts");
@@ -41,7 +42,7 @@ namespace ReverseProxyPOC.Proxy.Controllers
         }
 
         [HttpGet("{id:int}")]
-        //[EndpointFeatureGate(features: FeatureFlags.WeatherForecast)]
+        [EndpointEnabledAttribute(enabled: false)]
         public WeatherForecast GetForecast(int id)
         {
             var rng = new Random();
